@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
 import {
   login as userLogin,
+  oauthToken,
   logout as userLogout,
   getUserInfo,
-  LoginData,
+  LoginData, TokenData,
 } from '@/api/user';
-import { setToken, clearToken } from '@/utils/auth';
+import {setToken, clearToken, setRefreshToken} from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { UserState } from './types';
 import useAppStore from '../app';
@@ -70,6 +71,17 @@ const useUserStore = defineStore('user', {
         throw err;
       }
     },
+    async loginToken(code:string) {
+      const appStore = useAppStore();
+      try {
+        const res = await oauthToken({code,host:appStore.authHost,basic:appStore.basic,client:appStore.clientId,redirect:appStore.authRedirect} as TokenData);
+        setToken(res.access_token);
+        setRefreshToken(res.refresh_token);
+      } catch (err) {
+        clearToken();
+        throw err;
+      }
+    },
     logoutCallBack() {
       const appStore = useAppStore();
       this.resetInfo();
@@ -79,8 +91,9 @@ const useUserStore = defineStore('user', {
     },
     // Logout
     async logout() {
+      const appStore = useAppStore();
       try {
-        await userLogout();
+        await userLogout(appStore.authHost,appStore.basic);
       } finally {
         this.logoutCallBack();
       }

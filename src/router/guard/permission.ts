@@ -8,6 +8,7 @@ import { WHITE_LIST, NOT_FOUND } from '../constants';
 
 export default function setupPermissionGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
+    console.warn('setupPermissionGuard');
     const appStore = useAppStore();
     const userStore = useUserStore();
     const Permission = usePermission();

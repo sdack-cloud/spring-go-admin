@@ -13,5 +13,10 @@
   "device": "desktop",
   "tabBar": false,
   "menuFromServer": false,
-  "serverMenu": []
+  "serverMenu": [],
+  "authHost": "http://localhost:9999",
+  "clientId": "sdack",
+  "basic": "c2RhY2s6NGNhMmMxNDA2NDgzMDMxYTdjNGRmODQwN2M=",
+  "authRedirect": "http://localhost:5173/dashboard/index",
+  "authLink": "http://localhost:9999/oauth2/authorize?response_type=code&client_id=sdack&redirect_uri=http://localhost:5173/dashboard/index&scope=profile"
 }

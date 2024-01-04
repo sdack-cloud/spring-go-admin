@@ -29,3 +29,8 @@ export const NOT_FOUND_ROUTE: RouteRecordRaw = {
   name: 'notFound',
   component: () => import('@/views/not-found/index.vue'),
 };
+export const LOGOUT: RouteRecordRaw = {
+  path: '/logout',
+  name: 'logout',
+  component: () => import('@/views/logout/index.vue'),
+};

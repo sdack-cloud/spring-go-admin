@@ -80,15 +80,15 @@
   const { loading, setLoading } = useLoading();
   const userStore = useUserStore();
 
-  const loginConfig = useStorage('login-config', {
-    rememberPassword: true,
-    username: 'admin', // 演示默认值
-    password: 'admin', // demo default value
-  });
-  const userInfo = reactive({
-    username: loginConfig.value.username,
-    password: loginConfig.value.password,
-  });
+  // const loginConfig = useStorage('login-config', {
+  //   rememberPassword: true,
+  //   username: 'admin', // 演示默认值
+  //   password: 'admin', // demo default value
+  // });
+  // const userInfo = reactive({
+  //   username: loginConfig.value.username,
+  //   password: loginConfig.value.password,
+  // });
 
   const handleSubmit = async ({
     errors,

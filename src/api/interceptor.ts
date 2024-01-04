@@ -1,10 +1,13 @@
 import axios from 'axios';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
-import { useUserStore } from '@/store';
-import { getToken } from '@/utils/auth';
+import {getRefreshToken, getToken} from '@/utils/auth';
+import qs from 'qs';
+import { useAppStore } from '@/store';
+
 
 export interface HttpResponse<T = unknown> {
+  error: string;
   status: number;
   msg: string;
   code: number;
@@ -26,7 +29,9 @@ axios.interceptors.request.use(
       if (!config.headers) {
         config.headers = {};
       }
-      config.headers.Authorization = `Bearer ${token}`;
+      if (!config.headers.Authorization) {
+          config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -37,35 +42,42 @@ axios.interceptors.request.use(
 );
 // add response interceptors
 axios.interceptors.response.use(
-  (response: AxiosResponse<HttpResponse>) => {
+  async (response: AxiosResponse<HttpResponse>) => {
+    const status = response.status as number;
     const res = response.data;
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
-      Message.error({
-        content: res.msg || 'Error',
-        duration: 5 * 1000,
-      });
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (
-        [50008, 50012, 50014].includes(res.code) &&
-        response.config.url !== '/api/user/info'
-      ) {
-        Modal.error({
-          title: 'Confirm logout',
-          content:
-            'You have been logged out, you can cancel to stay on this page, or log in again',
-          okText: 'Re-Login',
-          async onOk() {
-            const userStore = useUserStore();
+    if (status === 200) {
+        if (res.error) {
+            return Promise.reject(new Error(res.error || 'Error'));
+        }
+        // TODO 你自己的业务逻辑处理
 
-            await userStore.logout();
-            window.location.reload();
-          },
-        });
-      }
-      return Promise.reject(new Error(res.msg || 'Error'));
     }
-    return res;
+    if (status === 401) {
+        const appStore = useAppStore();
+          const refreshToken = getRefreshToken();
+          if (!refreshToken) {
+              window.location.href = appStore.authLink;
+          } else {
+              const response1 = await axios.request({
+                  url: appStore.authHost,
+                  method: 'POST',
+                  headers:{'Content-Type':'application/x-www-form-urlencoded','Authorization': `Basic ${appStore.basic}`},
+                  data:  qs.stringify({'refresh_token':refreshToken,'grant_type':'refresh_token','scope':'profile'})
+              });
+              if (response1.status !== 200) {
+                  window.location.href = appStore.authLink;
+              } else if (response1.data.error) {
+                  window.location.href = appStore.authLink;
+              } else {
+                  setToken(response1.data.access_token);
+                  setRefreshToken(response1.data.refresh_token);
+                  const config = response.config as AxiosRequestConfig;
+                  config.headers.Authorization = `Bearer ${response1.data.access_token}`;
+                  return axios.request(config);
+              }
+          }
+      }
+      return res;
   },
   (error) => {
     Message.error({

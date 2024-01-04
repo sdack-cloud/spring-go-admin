@@ -1,4 +1,4 @@
-import Mock from 'mockjs';
+import Mock, {mock} from 'mockjs';
 import setupMock, {
   successResponseWrap,
   failResponseWrap,
@@ -8,6 +8,7 @@ import { MockParams } from '@/types/mock';
 import { isLogin } from '@/utils/auth';
 
 setupMock({
+  mock:false,
   setup() {
     // Mock.XHR.prototype.withCredentials = true;
 

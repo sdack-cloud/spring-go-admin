@@ -1,11 +1,12 @@
 import type { Router, LocationQueryRaw } from 'vue-router';
 import NProgress from 'nprogress'; // progress bar
 
-import { useUserStore } from '@/store';
+import { useUserStore,useAppStore } from '@/store';
 import { isLogin } from '@/utils/auth';
 
 export default function setupUserLoginInfoGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
+    console.warn('setupUserLoginInfoGuard');
     NProgress.start();
     const userStore = useUserStore();
     if (isLogin()) {
@@ -16,28 +17,35 @@ export default function setupUserLoginInfoGuard(router: Router) {
           await userStore.info();
           next();
         } catch (error) {
-          await userStore.logout();
-          next({
-            name: 'login',
-            query: {
-              redirect: to.name,
-              ...to.query,
-            } as LocationQueryRaw,
-          });
+          // userStore.logout();
+          // next({
+          //   name: 'logout',
+          // });
         }
       }
     } else {
-      if (to.name === 'login') {
+      if (to.name === 'logout' || to.name === 'notFound' || to.name === 'redirectWrapper') {
         next();
         return;
       }
-      next({
-        name: 'login',
-        query: {
-          redirect: to.name,
-          ...to.query,
-        } as LocationQueryRaw,
-      });
+      if (to.path === '/dashboard/index' && to.query.code && to.query.code.length) {
+        await userStore.loginToken(to.query.code);
+        next();
+        return;
+      }
+      const appStore = useAppStore();
+      window.location.href = appStore.authLink;
+      // if (to.name === 'login') {
+      //   next();
+      //   return;
+      // }
+      // next({
+      //   name: 'login',
+      //   query: {
+      //     redirect: to.name,
+      //     ...to.query,
+      //   } as LocationQueryRaw,
+      // });
     }
   });
 }

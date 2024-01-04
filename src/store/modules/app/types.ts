@@ -16,5 +16,10 @@ export interface AppState {
   tabBar: boolean;
   menuFromServer: boolean;
   serverMenu: RouteRecordNormalized[];
+  authHost: string; // 授权地址
+  clientId: string; // 客户端ID
+  basic: string; // Basic key
+  authRedirect: string; // 授权重定向地址
+  authLink: string; // 授权码链接
   [key: string]: unknown;
 }
