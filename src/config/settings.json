@@ -18,5 +18,5 @@
   "clientId": "sdack",
   "basic": "c2RhY2s6NGNhMmMxNDA2NDgzMDMxYTdjNGRmODQwN2M=",
   "authRedirect": "http://localhost:5173/dashboard/index",
-  "authLink": "http://localhost:9999/oauth2/authorize?response_type=code&client_id=sdack&redirect_uri=http://localhost:5173/dashboard/index&scope=profile"
+  "authLink": "http://localhost:9999/oauth2/authorize?response_type=code&client_id=sdack&redirect_uri=http://localhost:5173/dashboard/index&scope=openid%20profile"
 }

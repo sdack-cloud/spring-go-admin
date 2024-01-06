@@ -56,9 +56,16 @@ const useUserStore = defineStore('user', {
 
     // Get user's information
     async info() {
-      const res = await getUserInfo();
-
-      this.setInfo(res.data);
+      const appStore = useAppStore();
+      const res = await getUserInfo(appStore.authHost);
+      const user = {
+        name: res.nickname,
+        avatar: res.avatar,
+        accountId: res.account,
+        role: "*"
+      }
+      window.localStorage.setItem('userRole', '*');
+      this.setInfo(user as UserState);
     },
 
     // Login
@@ -80,6 +87,8 @@ const useUserStore = defineStore('user', {
       } catch (err) {
         clearToken();
         throw err;
+      } finally {
+        await this.info();
       }
     },
     logoutCallBack() {

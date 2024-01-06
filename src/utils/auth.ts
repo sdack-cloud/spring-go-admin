@@ -1,5 +1,6 @@
 const TOKEN_KEY = 'token';
 const REFRESH_KEY = 'refresh';
+const ROLE_KEY = 'userRole';
 
 
 const isLogin = () => {
@@ -25,6 +26,7 @@ const setRefreshToken = (token: string) => {
 const clearToken = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_KEY);
+  localStorage.removeItem(ROLE_KEY);
 };
 
 export { isLogin, getToken, setToken,getRefreshToken,setRefreshToken, clearToken };

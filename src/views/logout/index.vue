@@ -8,9 +8,11 @@
 </template>
 
 <script lang="ts" setup>
+import { useAppStore } from '@/store';
 
   const back = () => {
-    window.location.href = 'http://localhost:9999/oauth2/authorize?response_type=code&client_id=sdack&redirect_uri=http://localhost:5173/dashboard/index&scope=profile';
+    const appStore = useAppStore();
+    window.location.href = appStore.authLink;
   };
 </script>
 

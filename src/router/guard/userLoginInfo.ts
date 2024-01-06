@@ -9,6 +9,8 @@ export default function setupUserLoginInfoGuard(router: Router) {
     console.warn('setupUserLoginInfoGuard');
     NProgress.start();
     const userStore = useUserStore();
+    const appStore = useAppStore();
+
     if (isLogin()) {
       if (userStore.role) {
         next();
@@ -17,10 +19,10 @@ export default function setupUserLoginInfoGuard(router: Router) {
           await userStore.info();
           next();
         } catch (error) {
-          // userStore.logout();
-          // next({
-          //   name: 'logout',
-          // });
+          userStore.logout();
+          next({
+            name: 'logout',
+          });
         }
       }
     } else {
@@ -33,7 +35,6 @@ export default function setupUserLoginInfoGuard(router: Router) {
         next();
         return;
       }
-      const appStore = useAppStore();
       window.location.href = appStore.authLink;
       // if (to.name === 'login') {
       //   next();

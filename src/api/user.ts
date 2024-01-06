@@ -44,8 +44,8 @@ export function logout(host:string,basic : string) {
   return '';
 }
 
-export function getUserInfo() {
-  return axios.post('/userinfo');
+export function getUserInfo(host: string) {
+  return axios.get(`${host}/userinfo`);
 }
 
 export function getMenuList() {

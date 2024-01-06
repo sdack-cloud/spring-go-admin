@@ -49,7 +49,13 @@ axios.interceptors.response.use(
         if (res.error) {
             return Promise.reject(new Error(res.error || 'Error'));
         }
+        const appStore = useAppStore();
+        if (response.config.url!.indexOf(appStore.authHost) >= 0) {
+            return res;
+        }
         // TODO 你自己的业务逻辑处理
+
+
 
     }
     if (status === 401) {
