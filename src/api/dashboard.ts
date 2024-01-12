@@ -10,11 +10,12 @@ export function queryContentData() {
   return axios.get<ContentDataRecord[]>('/api/content-data');
 }
 
-export interface PopularRecord {
-  key: number;
-  clickNumber: string;
-  title: string;
-  increases: number;
+export interface RoleData {
+  id: number;
+  nameKey: string;
+  remark: string;
+  created: string;
+  createdName: string;
 }
 
 export function queryPopularList(params: { type: string }) {

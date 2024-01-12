@@ -63,9 +63,12 @@ const useUserStore = defineStore('user', {
         avatar: res.avatar,
         accountId: res.account,
         role: "*"
-      }
+      } as UserState
       window.localStorage.setItem('userRole', '*');
-      this.setInfo(user as UserState);
+      this.setInfo(user);
+
+
+
     },
 
     // Login
@@ -102,7 +105,7 @@ const useUserStore = defineStore('user', {
     async logout() {
       const appStore = useAppStore();
       try {
-        await userLogout(appStore.authHost,appStore.basic);
+        // await userLogout(appStore.authHost,appStore.basic);
       } finally {
         this.logoutCallBack();
       }

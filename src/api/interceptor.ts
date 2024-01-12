@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
-import {getRefreshToken, getToken} from '@/utils/auth';
+import {getRefreshToken, getToken,setToken,setRefreshToken} from '@/utils/auth';
 import qs from 'qs';
 import { useAppStore } from '@/store';
 
@@ -58,35 +58,36 @@ axios.interceptors.response.use(
 
 
     }
-    if (status === 401) {
-        const appStore = useAppStore();
+      return res;
+  },
+  async (error) => {
+      const response = error.response as AxiosResponse<HttpResponse>;
+      if (response.status === 401) {
+          const appStore = useAppStore();
           const refreshToken = getRefreshToken();
           if (!refreshToken) {
               window.location.href = appStore.authLink;
           } else {
-              const response1 = await axios.request({
-                  url: appStore.authHost,
+              const refreshResponse = await axios.request({
+                  url: `${appStore.authHost}/oauth2/token`,
                   method: 'POST',
                   headers:{'Content-Type':'application/x-www-form-urlencoded','Authorization': `Basic ${appStore.basic}`},
-                  data:  qs.stringify({'refresh_token':refreshToken,'grant_type':'refresh_token','scope':'profile'})
+                  data:  qs.stringify({'refresh_token':refreshToken,'grant_type':'refresh_token','scope':'openid profile'})
               });
-              if (response1.status !== 200) {
-                  window.location.href = appStore.authLink;
-              } else if (response1.data.error) {
+              if (refreshResponse.error) {
                   window.location.href = appStore.authLink;
               } else {
-                  setToken(response1.data.access_token);
-                  setRefreshToken(response1.data.refresh_token);
+                  setToken(refreshResponse.access_token);
+                  setRefreshToken(refreshResponse.refresh_token);
                   const config = response.config as AxiosRequestConfig;
-                  config.headers.Authorization = `Bearer ${response1.data.access_token}`;
-                  return axios.request(config);
+                  config.headers.Authorization = `Bearer ${refreshResponse.access_token}`;
+                  const req = await axios.request(config);
+                  return Promise.resolve(req);
               }
           }
       }
-      return res;
-  },
-  (error) => {
-    Message.error({
+
+      Message.error({
       content: error.msg || 'Request Error',
       duration: 5 * 1000,
     });

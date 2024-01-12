@@ -14,7 +14,7 @@ export default function setupUserLoginInfoGuard(router: Router) {
     if (isLogin()) {
       if (userStore.role) {
         next();
-      } else {
+      } else if (appStore.authRedirect.toString().indexOf(to.path) < 0) {
         try {
           await userStore.info();
           next();
@@ -24,13 +24,15 @@ export default function setupUserLoginInfoGuard(router: Router) {
             name: 'logout',
           });
         }
+      } else {
+        next();
       }
     } else {
       if (to.name === 'logout' || to.name === 'notFound' || to.name === 'redirectWrapper') {
         next();
         return;
       }
-      if (to.path === '/dashboard/index' && to.query.code && to.query.code.length) {
+      if (appStore.authRedirect.toString().indexOf(to.path) >= 0 && to.query.code && to.query.code.length) {
         await userStore.loginToken(to.query.code);
         next();
         return;
